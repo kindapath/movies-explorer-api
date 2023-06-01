@@ -1,15 +1,25 @@
 const router = require('express').Router();
+
 const routerUsers = require('./users');
 const routerMovies = require('./movies');
+const auth = require('../middlewares/auth');
+const {
+  validateCreateUser,
+  validateLogin,
+} = require('../middlewares/validations');
 
 const { login, createUser } = require('../controllers/users');
 
-router.post('/signup', createUser);
+router.post('/signup', validateCreateUser, createUser);
 
-router.post('/signin', login);
+router.post('/signin', validateLogin, login);
 
-router.use('/users', routerUsers);
+router.get('/signout', (req, res) => {
+  res.clearCookie('jwt').send({ message: 'Вы успешно вышли из аккаунта.' });
+});
 
-router.use('/movies', routerMovies);
+router.use('/users', auth, routerUsers);
+
+router.use('/movies', auth, routerMovies);
 
 module.exports = router;

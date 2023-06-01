@@ -1,9 +1,15 @@
 const { default: mongoose } = require('mongoose');
+const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const User = require('../models/user');
 const NotFoundError = require('../errors/not-found-err');
 const ConflictError = require('../errors/conflict-err');
 const BadRequestError = require('../errors/bad-request-err');
+
+const {
+  NODE_ENV,
+  JWT_SECRET,
+} = process.env;
 
 module.exports.getCurrentUser = (req, res, next) => {
   const {
@@ -14,7 +20,10 @@ module.exports.getCurrentUser = (req, res, next) => {
       throw new NotFoundError('Пользователь не найден.');
     })
     .then((user) => {
-      res.send(user);
+      res.send({
+        email: user.email,
+        name: user.name,
+      });
     })
     .catch(next);
 };
@@ -59,7 +68,10 @@ module.exports.editProfile = (req, res, next) => {
       throw new NotFoundError('Пользователь не найден.');
     })
     .then((user) => {
-      res.send(user);
+      res.send({
+        email: user.email,
+        name: user.name,
+      });
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
@@ -70,22 +82,25 @@ module.exports.editProfile = (req, res, next) => {
     });
 };
 
-// module.exports.login = (req, res, next) => {
-//   const { email, password } = req.body;
+module.exports.login = (req, res, next) => {
+  const { email, password } = req.body;
 
-//   return User.findUserByCredentials(email, password)
-//     .then((user) => {
-//       const token = jwt.sign({ _id: user._id },
-//        NODE_ENV === 'production' ? JWT_SECRET : 'secret-key', { expiresIn: '7d' });
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign(
+        { _id: user._id },
+        NODE_ENV === 'production' ? JWT_SECRET : 'secret-key',
+        { expiresIn: '7d' },
+      );
 
-//       res
-//         .cookie('jwt', token, {
-//           // token - наш JWT токен, который мы отправляем
-//           maxAge: 3600000,
-//           httpOnly: true,
-//         })
-//         .send({ email })
-//         .end();
-//     })
-//     .catch(next);
-// };
+      res
+        .cookie('jwt', token, {
+          // token - наш JWT токен, который мы отправляем
+          maxAge: 3600000,
+          httpOnly: true,
+        })
+        .send({ email })
+        .end();
+    })
+    .catch(next);
+};
