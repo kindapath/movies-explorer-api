@@ -3,13 +3,18 @@ const router = require('express').Router();
 const {
   getSavedMovies,
   saveMovie,
-  // deleteCard,
+  deleteMovie,
 } = require('../controllers/movies');
+
+const {
+  validateSaveMovie,
+  validateMovieId,
+} = require('../middlewares/validations');
 
 router.get('/', getSavedMovies);
 
-router.post('/', saveMovie); // add validationSaveCard middleware
+router.post('/', validateSaveMovie, saveMovie);
 
-// router.delete('/:movieId', deleteCard);
+router.delete('/:movieId', validateMovieId, deleteMovie);
 
 module.exports = router;

@@ -35,8 +35,6 @@ module.exports.saveMovie = (req, res, next) => {
     nameEN,
   } = req.body;
 
-  // console.log(req.body);
-
   Movie.create({
     owner: userId,
     country,
@@ -56,11 +54,30 @@ module.exports.saveMovie = (req, res, next) => {
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
-        console.log(err);
-
         next(new BadRequestError('Некорректные данные при сохранении фильма.'));
       } else {
         next(err);
       }
     });
+};
+
+module.exports.deleteMovie = (req, res, next) => {
+  const {
+    movieId,
+  } = req.params;
+  const {
+    _id: userId,
+  } = req.user;
+
+  Movie.findOne({ movieId, owner: userId })
+    .orFail(() => {
+      throw new NotFoundError('Такой фильм не найден.');
+    })
+    .then((movie) => {
+      if (movie.owner.toString() === userId) {
+        return movie.deleteOne().then(() => res.send(movie));
+      }
+      throw new ForbiddenError('Нет доступа.');
+    })
+    .catch(next);
 };

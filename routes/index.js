@@ -9,6 +9,7 @@ const {
 } = require('../middlewares/validations');
 
 const { login, createUser } = require('../controllers/users');
+const NotFoundError = require('../errors/not-found-err');
 
 router.post('/signup', validateCreateUser, createUser);
 
@@ -21,5 +22,7 @@ router.get('/signout', (req, res) => {
 router.use('/users', auth, routerUsers);
 
 router.use('/movies', auth, routerMovies);
+
+router.use('*', (req, res, next) => next(new NotFoundError('Некорректный путь или запрос.')));
 
 module.exports = router;

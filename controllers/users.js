@@ -74,7 +74,9 @@ module.exports.editProfile = (req, res, next) => {
       });
     })
     .catch((err) => {
-      if (err instanceof mongoose.Error.ValidationError) {
+      if (err.code === 11000) {
+        next(new ConflictError('Пользователь с таким email уже существует.'));
+      } else if (err instanceof mongoose.Error.ValidationError) {
         next(new BadRequestError('Некорректные данные при обновлении профиля.'));
       } else {
         next(err);
