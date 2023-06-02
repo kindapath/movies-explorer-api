@@ -4,21 +4,28 @@ Joi.objectId = require('joi-objectid')(Joi);
 const validateCreateUser = celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
-    password: Joi.string().required().min(8),
+    password: Joi.string().required(),
     name: Joi.string().required().min(2).max(30),
+  }),
+});
+
+const validateEditUser = celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().email(),
+    name: Joi.string().min(2).max(30),
   }),
 });
 
 const validateLogin = celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
-    password: Joi.string().required().min(8),
+    password: Joi.string().required(),
   }),
 });
 
 const validateMovieId = celebrate({
   params: Joi.object().keys({
-    movieId: Joi.number().required(),
+    movieId: Joi.objectId().required(),
   }),
 });
 
@@ -32,7 +39,7 @@ const validateSaveMovie = celebrate({
     image: Joi.string().required().uri(),
     trailerLink: Joi.string().required().uri(),
     thumbnail: Joi.string().required().uri(),
-    movieId: Joi.number().required(),
+    movieId: Joi.objectId().required(),
     nameRU: Joi.string().required(),
     nameEN: Joi.string().required(),
   }),
@@ -40,6 +47,7 @@ const validateSaveMovie = celebrate({
 
 module.exports = {
   validateSaveMovie,
+  validateEditUser,
   validateCreateUser,
   validateLogin,
   validateMovieId,

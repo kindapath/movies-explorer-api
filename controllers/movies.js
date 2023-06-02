@@ -71,7 +71,7 @@ module.exports.deleteMovie = (req, res, next) => {
 
   Movie.findOne({ movieId, owner: userId })
     .orFail(() => {
-      throw new NotFoundError('Такой фильм не найден.');
+      throw new NotFoundError('Такой фильм не найден или вы его не сохраняли.');
     })
     .then((movie) => {
       if (movie.owner.toString() === userId) {

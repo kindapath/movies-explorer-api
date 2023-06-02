@@ -15,7 +15,7 @@ router.post('/signup', validateCreateUser, createUser);
 
 router.post('/signin', validateLogin, login);
 
-router.get('/signout', (req, res) => {
+router.get('/signout', auth, (req, res) => {
   res.clearCookie('jwt').send({ message: 'Вы успешно вышли из аккаунта.' });
 });
 

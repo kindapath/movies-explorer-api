@@ -28,7 +28,6 @@ mongoose.connect('mongodb://127.0.0.1:27017/bitfilmsdb', {
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(limiter);
 
 // cors
 app.options('*', cors({
@@ -43,6 +42,7 @@ app.use(cors({
 
 // routes
 app.use(requestLogger);
+app.use(limiter);
 app.use(routes);
 
 // errors
