@@ -63,13 +63,13 @@ module.exports.saveMovie = (req, res, next) => {
 
 module.exports.deleteMovie = (req, res, next) => {
   const {
-    movieId,
+    id,
   } = req.params;
   const {
     _id: userId,
   } = req.user;
 
-  Movie.findOne({ movieId, owner: userId })
+  Movie.findById(id)
     .orFail(() => {
       throw new NotFoundError('Такой фильм не найден или вы его не сохраняли.');
     })
