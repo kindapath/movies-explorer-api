@@ -39,7 +39,23 @@ module.exports.createUser = (req, res, next) => {
       password: hash,
     }))
     .then((user) => {
-      res.status(201).send(user);
+      const token = jwt.sign(
+        { _id: user._id },
+        NODE_ENV === 'production' ? JWT_SECRET : 'secret-key',
+        { expiresIn: '7d' },
+      );
+
+      res
+        .cookie('jwt', token, {
+          // token - наш JWT токен, который мы отправляем
+          maxAge: 3600000,
+          httpOnly: true,
+        })
+        .status(201)
+        .send({
+          user,
+        })
+        .end();
     })
     .catch((err) => {
       if (err.code === 11000) {
@@ -101,7 +117,10 @@ module.exports.login = (req, res, next) => {
           maxAge: 3600000,
           httpOnly: true,
         })
-        .send({ email })
+        .send({
+          email,
+          name: user.name,
+        })
         .end();
     })
     .catch(next);
