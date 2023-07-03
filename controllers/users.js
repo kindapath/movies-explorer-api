@@ -52,9 +52,7 @@ module.exports.createUser = (req, res, next) => {
           httpOnly: true,
         })
         .status(201)
-        .send({
-          user,
-        })
+        .send(user)
         .end();
     })
     .catch((err) => {
